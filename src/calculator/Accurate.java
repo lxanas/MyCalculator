@@ -1,5 +1,5 @@
 package calculator;
 
-public class Analysis
+public class Accurate
 {
 }

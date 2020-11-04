@@ -65,7 +65,7 @@ public class Calculator
         return value.replace("~","-");
     }
 
-    //对表达式进行计算
+    //对整个表达式进行计算
     private double calculate(String expression)
     {
         Deque<String> resDeque= new LinkedList<>();
@@ -97,6 +97,7 @@ public class Calculator
     }
 
     //对表达式计算中的单次计算操作进行处理
+    //未完成
     private String calculate(String firstValue,String secondValue,char op)
     {
         String res="";
@@ -115,13 +116,43 @@ public class Calculator
     {
         opStack.add('#');
         char[] arr = expression.toCharArray();
-        int count=0;
-        int curIndex=0;
-        char cur,top;
+        int count=0; //数字长度
+        int curIndex=0; //当前字符位置
+        char cur,top; //当前字符和栈顶字符
         for(int i=0;i<arr.length;i++)
         {
             cur=arr[i];
+            if(isOperator(cur))
+            {
+                if(count>0)
+                {
+                    rpnStack.push(new String(arr,curIndex,count));
+                }
+                top=opStack.peek();
+                if(cur==')')
+                {
+                    while(opStack.peek()!='(')
+                    {
+                        rpnStack.push(String.valueOf(opStack.pop()));
+                    }
+                    opStack.pop();
+                }
+                else
+                {
+                    while (cur != '(' && top != ',' && compare(cur, top))
+                    {
+                        rpnStack.push(String.valueOf(opStack.pop()));
+                        top = opStack.peek();
+                    }
+                    opStack.push(cur);
+                }
+            }
+            else
+            {
+                count++;
+            }
         }
+
 
 
     }
@@ -129,6 +160,16 @@ public class Calculator
     private boolean isOperator(char c)
     {
         return c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')';
+    }
+
+    public boolean compare(char cur, char peek)
+    {// 如果是peek优先级高于cur，返回true，默认都是peek优先级要低
+        boolean result = false;
+        if (opPriority[(peek) - 40] >= opPriority[(cur) - 40])
+        {
+            result = true;
+        }
+        return result;
     }
 
 

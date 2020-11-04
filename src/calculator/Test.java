@@ -1,6 +1,6 @@
 package calculator;
 
-public class test
+public class Test
 {
 
 }

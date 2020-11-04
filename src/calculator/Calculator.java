@@ -1,7 +1,5 @@
 package calculator;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 
@@ -9,11 +7,12 @@ public class Calculator
 {
     private Deque<String> rpnStack = new LinkedList<>(); //逆波兰表达式堆栈
     private Deque<Character> opStack = new LinkedList<>(); //操作符堆栈
-    private int[] opPriority = new int[] { 0, 3, 2, 1, -1, 1, 0, 2 }; //操作符优先级
+    private final int[] opPriority = new int[] { 0, 3, 2, 1, -1, 1, 0, 2 }; //操作符优先级
 
-    public static double calculate(String expression)
+    //读入数据并处理返回结果
+    public static double putIn(String expression)
     {
-        double res=0;
+        double res;
         Calculator cal = new Calculator();
         try{
             expression = transform(expression);
@@ -23,7 +22,7 @@ public class Calculator
             // 运算错误返回NaN
             return 0.0 / 0.0;
         }
-
+        
         return res;
     }
 
@@ -60,16 +59,78 @@ public class Calculator
         }
     }
 
+    //计算时将负号还原
+    private String untransformed(String value)
+    {
+        return value.replace("~","-");
+    }
+
+    //对表达式进行计算
     private double calculate(String expression)
     {
         Deque<String> resDeque= new LinkedList<>();
-        before(expression);
+        rpn(expression);
+        String firstValue,secondValue,current;
+        while(!rpnStack.isEmpty())
+        {
+            current=rpnStack.removeLast();
+            if(!isOperator(current.charAt(0)))
+            {
+                current = untransformed(current);
+                resDeque.push(current);
+            }
+            else
+            {
+                secondValue=resDeque.pop();
+                firstValue=resDeque.pop();
 
+                firstValue = untransformed(firstValue);
+                secondValue = untransformed(secondValue);
+
+                String temp=calculate(firstValue,secondValue,current.charAt(0));
+                resDeque.push(temp);
+            }
+
+        }
+
+        return Double.valueOf(resDeque.pop());
     }
 
-    private void before(String expression)
+    //对表达式计算中的单次计算操作进行处理
+    private String calculate(String firstValue,String secondValue,char op)
     {
+        String res="";
+        switch (op)
+        {
+            case '+'-> res=String.valueOf(1);
+            case '-'-> res=String.valueOf(2);
+            case '*'-> res=String.valueOf(3);
+            case '/'-> res=String.valueOf(4);
+        }
+        return res;
+    }
+
+    //中缀表达式转为逆波兰式
+    private void rpn(String expression)
+    {
+        opStack.add('#');
+        char[] arr = expression.toCharArray();
+        int count=0;
+        int curIndex=0;
+        char cur,top;
+        for(int i=0;i<arr.length;i++)
+        {
+            cur=arr[i];
+        }
+
 
     }
+
+    private boolean isOperator(char c)
+    {
+        return c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')';
+    }
+
+
 
 }

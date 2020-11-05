@@ -22,6 +22,8 @@ public class Calculator
             // 运算错误返回NaN
             return 0.0 / 0.0;
         }
+//        expression = transform(expression);
+//        res = cal.calculate(expression);
         
         return res;
     }
@@ -113,7 +115,7 @@ public class Calculator
     //中缀表达式转为逆波兰式
     private void rpn(String expression)
     {
-        opStack.add(',');
+        opStack.push(',');
         char[] arr = expression.toCharArray();
         int count=0; //数字长度
         int curIndex=0; //当前字符位置
@@ -145,20 +147,23 @@ public class Calculator
                     }
                     opStack.push(cur);
                 }
+                count=0;
+                curIndex=i+1;
             }
             else
             {
                 count++;
             }
-            if (count > 1 || (count == 1 && !isOperator(arr[curIndex])))
-            {// 最后一个字符不是括号或者其他运算符的则加入后缀式栈中
-                rpnStack.push(new String(arr, curIndex, count));
-            }
 
-            while (opStack.peek() != ',')
-            {
-                rpnStack.push(String.valueOf(opStack.pop()));// 将操作符栈中的剩余的元素添加到后缀式栈中
-            }
+        }
+        if (count > 1 || (count == 1 && !isOperator(arr[curIndex])))
+        {// 最后一个字符不是括号或者其他运算符的则加入后缀式栈中
+            rpnStack.push(new String(arr, curIndex, count));
+        }
+
+        while (opStack.peek() != ',')
+        {
+            rpnStack.push(String.valueOf(opStack.pop()));// 将操作符栈中的剩余的元素添加到后缀式栈中
         }
 
 

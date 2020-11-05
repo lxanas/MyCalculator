@@ -8,7 +8,8 @@ public class Test
     {
         Scanner in = new Scanner(System.in);
         String exp = in.nextLine();
-        double res=Calculator.putIn(exp);
+        String exp1 = "0+"+exp;
+        double res=Calculator.putIn(exp1);
         System.out.println(exp + " = " + res);
     }
 

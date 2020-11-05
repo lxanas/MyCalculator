@@ -97,16 +97,15 @@ public class Calculator
     }
 
     //对表达式计算中的单次计算操作进行处理
-    //未完成
     private String calculate(String firstValue,String secondValue,char op)
     {
         String res="";
         switch (op)
         {
-            case '+'-> res=String.valueOf(1);
-            case '-'-> res=String.valueOf(2);
-            case '*'-> res=String.valueOf(3);
-            case '/'-> res=String.valueOf(4);
+            case '+'-> res = String.valueOf(Accurate.add(firstValue, secondValue));
+            case '-'-> res = String.valueOf(Accurate.sub(firstValue, secondValue));
+            case '*'-> res = String.valueOf(Accurate.mul(firstValue, secondValue));
+            case '/'-> res = String.valueOf(Accurate.div(firstValue, secondValue));
         }
         return res;
     }
@@ -114,7 +113,7 @@ public class Calculator
     //中缀表达式转为逆波兰式
     private void rpn(String expression)
     {
-        opStack.add('#');
+        opStack.add(',');
         char[] arr = expression.toCharArray();
         int count=0; //数字长度
         int curIndex=0; //当前字符位置
@@ -151,19 +150,31 @@ public class Calculator
             {
                 count++;
             }
+            if (count > 1 || (count == 1 && !isOperator(arr[curIndex])))
+            {// 最后一个字符不是括号或者其他运算符的则加入后缀式栈中
+                rpnStack.push(new String(arr, curIndex, count));
+            }
+
+            while (opStack.peek() != ',')
+            {
+                rpnStack.push(String.valueOf(opStack.pop()));// 将操作符栈中的剩余的元素添加到后缀式栈中
+            }
         }
 
 
 
     }
 
+    //判断计算符号
     private boolean isOperator(char c)
     {
         return c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')';
     }
 
+    //比较计算符号优先级
     public boolean compare(char cur, char peek)
-    {// 如果是peek优先级高于cur，返回true，默认都是peek优先级要低
+    {
+        // 如果是peek优先级高于cur，返回true，默认都是peek优先级要低
         boolean result = false;
         if (opPriority[(peek) - 40] >= opPriority[(cur) - 40])
         {

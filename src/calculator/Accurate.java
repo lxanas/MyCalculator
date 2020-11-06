@@ -36,4 +36,11 @@ public class Accurate
         BigDecimal b2 = new BigDecimal(v2);
         return b1.divide(b2, DIV_SCALE, RoundingMode.HALF_UP).doubleValue();
     }
+
+    public static double pow(String v1, String v2) {
+        BigDecimal b1 = new BigDecimal(v1);
+//        BigDecimal b2 = new BigDecimal(v2);
+        int b2=Integer.parseInt(v2);
+        return b1.pow(b2).doubleValue();
+    }
 }

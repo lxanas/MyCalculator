@@ -3,17 +3,23 @@ package calculator;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.regex.Pattern;
 
 public class Calculator
 {
     private final Deque<String> rpnStack = new LinkedList<>(); //逆波兰表达式堆栈
     private final Deque<Character> opStack = new LinkedList<>(); //操作符堆栈
     private final Queue<String> exp = new LinkedList<>(); //将表达式读入存入队列
-    private final int[] opPriority = new int[]{0, 3, 2, 1, -1, 1, 0, 2}; //操作符优先级
+    private final int[] opPriority = new int[]{0, 4, 2, 1, -1, 1, 0, 2, 3}; //操作符优先级
 
+    private String beforeRead(String expression)
+    {
+        return "0+"+expression;
+    }
     //将表达式读入并处理成数字和运算符进入队列
     private void read(String expression)
     {
+//        expression=beforeRead(expression);
         char[] arr = expression.toCharArray();
         int count = 0;
         int curIndex = 0;
@@ -35,7 +41,7 @@ public class Calculator
                 count = 0;
                 curIndex = i + 1;
             }
-            if(i == arr.length-1)
+            if (i == arr.length - 1 && !isOperator(curCh))
             {
                 exp.offer(new String(arr, curIndex, count));
             }
@@ -44,10 +50,14 @@ public class Calculator
 
     }
 
-    public  static void test(String expression)
+    //测试函数，方便查看栈内情况
+    public static void test(String expression)
     {
-        Calculator cal= new Calculator();
+        Calculator cal = new Calculator();
+        expression = transform(expression);
         cal.read(expression);
+//        cal.rpn_a();
+        cal.rpn(expression);
         System.out.println("fine.");
     }
 
@@ -152,6 +162,7 @@ public class Calculator
             case '-' -> res = String.valueOf(Accurate.sub(firstValue, secondValue));
             case '*' -> res = String.valueOf(Accurate.mul(firstValue, secondValue));
             case '/' -> res = String.valueOf(Accurate.div(firstValue, secondValue));
+            case '^' -> res = String.valueOf(Accurate.pow(firstValue, secondValue));
         }
         return res;
     }
@@ -213,10 +224,78 @@ public class Calculator
 
     }
 
+    public boolean isInteger(String str)
+    {
+        char[] chars=str.toCharArray();
+        if(chars.length==1)
+            return false;
+        else
+            {
+                return true;
+        }
+    }
+
+    private void rpn_a()
+    {
+        String cur="";
+        while(!exp.isEmpty())
+        {
+            cur=exp.poll();
+            cur=untransformed(cur);
+            if(isInteger(cur))
+            {
+                rpnStack.push(cur);
+            }
+            else
+            {
+                char[] chars = cur.toCharArray();
+                char temp=chars[0];
+                if(opStack.isEmpty())
+                {
+                    opStack.push(temp);
+                }
+                else if(chars[0]=='(')
+                {
+                    opStack.push(temp);
+                }
+                else if(temp==')')
+                {
+                    char top= opStack.peek();
+                    while (top!='(')
+                    {
+                        char op= opStack.pop();
+                        rpnStack.push(String.valueOf(op));
+                        top= opStack.peek();
+                    }
+                    opStack.pop();
+                }
+                else
+                {
+                    while(levelF(temp)<levelS(opStack.peek()))
+//                    while (compare(temp, opStack.peek()))
+                    {
+                        char op= opStack.pop();
+                        rpnStack.push(String.valueOf(op));
+                        if(opStack.isEmpty())
+                            break;
+                    }
+                    opStack.push(temp);
+                }
+            }
+
+        }
+        while (!opStack.isEmpty())
+        {
+            char op= opStack.pop();
+            rpnStack.push(String.valueOf(op));
+        }
+
+    }
+
     //判断计算符号
     private boolean isOperator(char c)
     {
-        return c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')';
+        return c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')' || c=='^';
     }
 
     //比较计算符号优先级
@@ -224,12 +303,43 @@ public class Calculator
     {
         // 如果是peek优先级高于cur，返回true，默认都是peek优先级要低
         boolean result = false;
+        if(cur=='^')
+            cur-=46;
+        if(peek=='^')
+            peek-=46;
         if (opPriority[(peek) - 40] >= opPriority[(cur) - 40])
         {
             result = true;
         }
         return result;
     }
+
+    public int levelF(char op)
+    {
+        int a=0;
+        if(op=='+'||op=='-')
+            a=2;
+        else if(op=='*'||op=='/')
+            a=4;
+        else if(op=='^')
+            a=7;
+        return a;
+    }
+
+    public int levelS(char op)
+    {
+        int a=0;
+        if(op=='+'||op=='-')
+            a=3;
+        else if(op=='*'||op=='/')
+            a=5;
+        else if(op=='^')
+            a=6;
+        else if(op=='(')
+            a=1;
+        return a;
+    }
+
 
 
 }

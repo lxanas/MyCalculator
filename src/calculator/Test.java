@@ -1,15 +1,17 @@
 package calculator;
 
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class Test
 {
+
     public static void main(String[] args)
     {
         Scanner in = new Scanner(System.in);
         String exp = in.nextLine();
-        String exp1 = "0+"+exp;
-        double res=Calculator.putIn(exp1);
+//        System.out.println(isInteger(exp));
+        double res=Calculator.putIn(exp);
         System.out.println(exp + " = " + res);
     }
 

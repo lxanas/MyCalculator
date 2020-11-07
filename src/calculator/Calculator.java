@@ -11,49 +11,49 @@ public class Calculator
     private Deque<Character> opStack = new LinkedList<>(); //操作符堆栈
     private Queue<String> exp = new LinkedList<>(); //将表达式读入存入队列
     private final int[] opPriority = new int[]{0, 4, 2, 1, -1, 1, 0, 2, 3}; //操作符优先级
-    private int flag=0;
+    private int flag = 0; //错误标记
 
     private String beforeRead(String expression)
     {
-        return "0+"+expression;
+        return "0+" + expression;
     }
 
     private void check(String expression)
     {
-        char[] chars=expression.toCharArray();
-        int countL=0;
-        int countR=0;
+        char[] chars = expression.toCharArray();
+        int countL = 0;
+        int countR = 0;
         for (int i = 0; i < chars.length; i++)
         {
-            if(chars[i]=='(')
+            if (chars[i] == '(')
             {
                 countL++;
             }
-            if(chars[i]==')')
+            if (chars[i] == ')')
             {
                 countR++;
             }
-            if(i>0&&(isOperator_a(chars[i])&&isOperator_a(chars[i-1])))
+            if (i > 0 && (isOperator_a(chars[i]) && isOperator_a(chars[i - 1])))
             {
-                flag=1;
+                flag = 1;
             }
-            if(chars[i]=='（')
-                flag=3;
+            if (chars[i] == '（')
+                flag = 3;
         }
-        if(countL!=countR)
-            flag=2;
-        if(flag==1)
+        if (countL != countR)
+            flag = 2;
+        if (flag == 1)
             System.out.println("输入非法表达式");
-        if(flag==2)
+        if (flag == 2)
             System.out.println("括号不匹配");
-        if(flag==3)
+        if (flag == 3)
             System.out.println("输入了中文括号，请输入英文括号");
     }
 
     //将表达式读入并处理成数字和运算符进入队列
     private void read(String expression)
     {
-//        expression=beforeRead(expression);
+        expression = beforeRead(expression);
         char[] arr = expression.toCharArray();
         int count = 0;
         int curIndex = 0;
@@ -262,57 +262,57 @@ public class Calculator
 
     public boolean isInteger(String str)
     {
-        char[] chars=str.toCharArray();
-        if(chars.length==1)
+        char[] chars = str.toCharArray();
+        if (chars.length == 1)
             return false;
         else
-            {
-                return true;
+        {
+            return true;
         }
     }
 
     private void rpn_a()
     {
-        String cur="";
-        while(!exp.isEmpty())
+        String cur = "";
+        while (!exp.isEmpty())
         {
-            cur=exp.poll();
-            cur=untransformed(cur);
-            if(isInteger(cur))
+            cur = exp.poll();
+            cur = untransformed(cur);
+            if (isInteger(cur))
             {
                 rpnStack.push(cur);
             }
             else
             {
                 char[] chars = cur.toCharArray();
-                char temp=chars[0];
-                if(opStack.isEmpty())
+                char temp = chars[0];
+                if (opStack.isEmpty())
                 {
                     opStack.push(temp);
                 }
-                else if(chars[0]=='(')
+                else if (chars[0] == '(')
                 {
                     opStack.push(temp);
                 }
-                else if(temp==')')
+                else if (temp == ')')
                 {
-                    char top= opStack.peek();
-                    while (top!='(')
+                    char top = opStack.peek();
+                    while (top != '(')
                     {
-                        char op= opStack.pop();
+                        char op = opStack.pop();
                         rpnStack.push(String.valueOf(op));
-                        top= opStack.peek();
+                        top = opStack.peek();
                     }
                     opStack.pop();
                 }
                 else
                 {
-                    while(levelF(temp)<levelS(opStack.peek()))
+                    while (levelF(temp) < levelS(opStack.peek()))
 //                    while (compare(temp, opStack.peek()))
                     {
-                        char op= opStack.pop();
+                        char op = opStack.pop();
                         rpnStack.push(String.valueOf(op));
-                        if(opStack.isEmpty())
+                        if (opStack.isEmpty())
                             break;
                     }
                     opStack.push(temp);
@@ -322,7 +322,7 @@ public class Calculator
         }
         while (!opStack.isEmpty())
         {
-            char op= opStack.pop();
+            char op = opStack.pop();
             rpnStack.push(String.valueOf(op));
         }
 
@@ -331,11 +331,12 @@ public class Calculator
     //判断计算符号
     private boolean isOperator(char c)
     {
-        return c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')' || c=='^';
+        return c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')' || c == '^';
     }
+
     private boolean isOperator_a(char c)
     {
-        return c == '+' || c == '-' || c == '*' || c == '/' || c=='^';
+        return c == '+' || c == '-' || c == '*' || c == '/' || c == '^';
     }
 
     //比较计算符号优先级
@@ -343,10 +344,10 @@ public class Calculator
     {
         // 如果是peek优先级高于cur，返回true，默认都是peek优先级要低
         boolean result = false;
-        if(cur=='^')
-            cur-=46;
-        if(peek=='^')
-            peek-=46;
+        if (cur == '^')
+            cur -= 46;
+        if (peek == '^')
+            peek -= 46;
         if (opPriority[(peek) - 40] >= opPriority[(cur) - 40])
         {
             result = true;
@@ -356,30 +357,29 @@ public class Calculator
 
     public int levelF(char op)
     {
-        int a=0;
-        if(op=='+'||op=='-')
-            a=2;
-        else if(op=='*'||op=='/')
-            a=4;
-        else if(op=='^')
-            a=7;
+        int a = 0;
+        if (op == '+' || op == '-')
+            a = 2;
+        else if (op == '*' || op == '/')
+            a = 4;
+        else if (op == '^')
+            a = 7;
         return a;
     }
 
     public int levelS(char op)
     {
-        int a=0;
-        if(op=='+'||op=='-')
-            a=3;
-        else if(op=='*'||op=='/')
-            a=5;
-        else if(op=='^')
-            a=6;
-        else if(op=='(')
-            a=1;
+        int a = 0;
+        if (op == '+' || op == '-')
+            a = 3;
+        else if (op == '*' || op == '/')
+            a = 5;
+        else if (op == '^')
+            a = 6;
+        else if (op == '(')
+            a = 1;
         return a;
     }
-
 
 
 }

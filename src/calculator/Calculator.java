@@ -7,15 +7,49 @@ import java.util.regex.Pattern;
 
 public class Calculator
 {
-    private final Deque<String> rpnStack = new LinkedList<>(); //逆波兰表达式堆栈
-    private final Deque<Character> opStack = new LinkedList<>(); //操作符堆栈
-    private final Queue<String> exp = new LinkedList<>(); //将表达式读入存入队列
+    private Deque<String> rpnStack = new LinkedList<>(); //逆波兰表达式堆栈
+    private Deque<Character> opStack = new LinkedList<>(); //操作符堆栈
+    private Queue<String> exp = new LinkedList<>(); //将表达式读入存入队列
     private final int[] opPriority = new int[]{0, 4, 2, 1, -1, 1, 0, 2, 3}; //操作符优先级
+    private int flag=0;
 
     private String beforeRead(String expression)
     {
         return "0+"+expression;
     }
+
+    private void check(String expression)
+    {
+        char[] chars=expression.toCharArray();
+        int countL=0;
+        int countR=0;
+        for (int i = 0; i < chars.length; i++)
+        {
+            if(chars[i]=='(')
+            {
+                countL++;
+            }
+            if(chars[i]==')')
+            {
+                countR++;
+            }
+            if(i>0&&(isOperator_a(chars[i])&&isOperator_a(chars[i-1])))
+            {
+                flag=1;
+            }
+            if(chars[i]=='（')
+                flag=3;
+        }
+        if(countL!=countR)
+            flag=2;
+        if(flag==1)
+            System.out.println("输入非法表达式");
+        if(flag==2)
+            System.out.println("括号不匹配");
+        if(flag==3)
+            System.out.println("输入了中文括号，请输入英文括号");
+    }
+
     //将表达式读入并处理成数字和运算符进入队列
     private void read(String expression)
     {
@@ -68,6 +102,8 @@ public class Calculator
         Calculator cal = new Calculator();
         try
         {
+            cal.check(expression);
+
             expression = transform(expression);
             res = cal.calculate(expression);
         } catch (Exception e)
@@ -296,6 +332,10 @@ public class Calculator
     private boolean isOperator(char c)
     {
         return c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')' || c=='^';
+    }
+    private boolean isOperator_a(char c)
+    {
+        return c == '+' || c == '-' || c == '*' || c == '/' || c=='^';
     }
 
     //比较计算符号优先级
